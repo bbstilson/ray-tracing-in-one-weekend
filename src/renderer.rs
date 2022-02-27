@@ -41,13 +41,7 @@ impl Renderer {
             for w in 0..self.image.width {
                 let u = w as f64 / (self.image.width - 1) as f64;
                 let v = h as f64 / (self.image.height - 1) as f64;
-                let ray = Ray::new(
-                    self.camera.origin,
-                    self.camera.lower_left_corner
-                        + (self.camera.horizontal * u)
-                        + (self.camera.vertical * v)
-                        - self.camera.origin,
-                );
+                let ray = self.camera.get_ray(u, v);
                 let (r, g, b) = self.ray_color(ray).to_rgb();
                 writer.write(format!("{} {} {}\n", r, g, b).as_bytes())?;
             }

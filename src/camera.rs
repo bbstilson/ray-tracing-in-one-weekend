@@ -1,4 +1,4 @@
-use crate::{point3d::Point3d, vector3::Vector3};
+use crate::{point3d::Point3d, ray::Ray, vector3::Vector3};
 
 pub struct Camera {
     pub origin: Point3d,
@@ -22,5 +22,12 @@ impl Camera {
             vertical,
             lower_left_corner,
         }
+    }
+
+    pub fn get_ray(&self, u: f64, v: f64) -> Ray {
+        Ray::new(
+            self.origin,
+            self.lower_left_corner + (self.horizontal * u) + (self.vertical * v) - self.origin,
+        )
     }
 }
