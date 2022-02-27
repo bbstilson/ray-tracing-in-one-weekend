@@ -1,4 +1,4 @@
-use crate::{hit::Hit, hittable::Hittable, point3d::Point3d, ray::Ray, vector3::Vector3};
+use crate::{hit::Hit, hittable::Hittable, point3d::Point3d, ray::Ray};
 
 pub struct Sphere {
     center: Point3d,
@@ -26,18 +26,17 @@ impl Hittable for Sphere {
             let root_b = (-half_b + sqrtd) / a;
             [root_a, root_b]
                 .iter()
-                .find(|root| **root < t_min || t_max > **root)
+                .find(|root| **root < t_max && **root > t_min)
                 .map(|root| {
                     let t = *root;
                     let point = ray.at(t);
-                    let outward_normal = (point - self.center) / self.radius;
-                    let is_front_face = ray.direction.dot(outward_normal).is_sign_negative();
-                    let normal = if is_front_face {
-                        outward_normal
-                    } else {
-                        -outward_normal
-                    };
-                    Hit { t, point, normal }
+                    let normal = (point - self.center) / self.radius;
+                    let is_front_face = ray.direction.dot(normal).is_sign_negative();
+                    Hit {
+                        t,
+                        point,
+                        normal: if is_front_face { normal } else { -normal },
+                    }
                 })
         } else {
             None

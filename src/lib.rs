@@ -9,3 +9,4 @@ pub mod renderer;
 pub mod sphere;
 pub mod vector3;
 pub mod vector_ops;
+pub mod world;
