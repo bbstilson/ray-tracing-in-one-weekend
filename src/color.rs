@@ -4,6 +4,7 @@ pub type Color = Vector3;
 
 pub const WHITE: Color = Vector3(1.0, 1.0, 1.0);
 pub const BLACK: Color = Vector3(0.0, 0.0, 0.0);
+pub const SALMON: Color = Vector3(0.91015625, 0.5859375, 0.4765625);
 
 impl Color {
     pub fn r(self) -> f64 {
