@@ -1,6 +1,6 @@
 use raytracer::{
-    camera::Camera, image::Image, point3d::Point3d, renderer::Renderer, sphere::Sphere,
-    world::World,
+    camera::Camera, image::Image, point3d::Point3d, renderer::Renderer, rng::RandomNumberGenerator,
+    sphere::Sphere, world::World,
 };
 
 fn main() {
@@ -10,7 +10,9 @@ fn main() {
         Sphere::new(Point3d::new(0.0, 0.0, -1.0), 0.5),
         Sphere::new(Point3d::new(0.0, -100.5, -1.0), 100.0),
     ]);
-    let renderer = Renderer::new(image, camera, world);
+    let rng = RandomNumberGenerator::new();
+    let samples_per_pixel = 100;
+    let mut renderer = Renderer::new(image, camera, world, samples_per_pixel, rng);
 
     let file = renderer.render().unwrap();
     let file_str = format!("{}", file.display());

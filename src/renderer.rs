@@ -1,8 +1,10 @@
 use crate::camera::Camera;
-use crate::color::{Color, WHITE};
+use crate::color::{Color, BLACK, WHITE};
 use crate::hittable::Hittable;
 use crate::image::Image;
 use crate::ray::Ray;
+use crate::rng::RandomNumberGenerator;
+use crate::utils::clamp01;
 use crate::vector3::Vector3;
 use crate::world::World;
 
@@ -18,18 +20,28 @@ pub struct Renderer {
     image: Image,
     camera: Camera,
     world: World,
+    samples_per_pixel: i32,
+    rng: RandomNumberGenerator,
 }
 
 impl Renderer {
-    pub fn new(image: Image, camera: Camera, world: World) -> Renderer {
+    pub fn new(
+        image: Image,
+        camera: Camera,
+        world: World,
+        samples_per_pixel: i32,
+        rng: RandomNumberGenerator,
+    ) -> Renderer {
         Renderer {
             image,
             camera,
             world,
+            samples_per_pixel,
+            rng,
         }
     }
 
-    pub fn render(&self) -> Result<PathBuf, io::Error> {
+    pub fn render(&mut self) -> Result<PathBuf, io::Error> {
         let file_path = Renderer::get_output_file();
         let output = file_path.clone();
         let file = fs::File::create(file_path)?;
@@ -37,12 +49,10 @@ impl Renderer {
 
         writer
             .write(format!("P3\n{} {}\n255\n", self.image.width, self.image.height).as_bytes())?;
+
         for h in (0..self.image.height).rev().progress() {
             for w in 0..self.image.width {
-                let u = w as f64 / (self.image.width - 1) as f64;
-                let v = h as f64 / (self.image.height - 1) as f64;
-                let ray = self.camera.get_ray(u, v);
-                let (r, g, b) = self.ray_color(ray).to_rgb();
+                let (r, g, b) = self.get_antialiased_pixel_color(w, h).to_rgb();
                 writer.write(format!("{} {} {}\n", r, g, b).as_bytes())?;
             }
         }
@@ -69,6 +79,31 @@ impl Renderer {
             Some(hit) => (WHITE + hit.normal) * 0.5,
             None => Renderer::hit_sky(ray),
         }
+    }
+
+    fn get_antialiased_pixel_color(&mut self, w: i32, h: i32) -> Color {
+        let pixel_color = (0..self.samples_per_pixel).fold(BLACK, |mut color, _| {
+            let u = (w as f64 + self.rng.get_random()) / (self.image.width - 1) as f64;
+            let v = (h as f64 + self.rng.get_random()) / (self.image.height - 1) as f64;
+            let ray = self.camera.get_ray(u, v);
+            color += self.ray_color(ray);
+            color
+        });
+        self.antialias(pixel_color)
+    }
+
+    fn antialias(&self, pixel_color: Color) -> Color {
+        let r = pixel_color.r();
+        let g = pixel_color.g();
+        let b = pixel_color.b();
+
+        // Divide the color by the number of samples.
+        let scale = 1.0 / self.samples_per_pixel as f64;
+        let r = r * scale;
+        let g = g * scale;
+        let b = b * scale;
+
+        Color::new(clamp01(r), clamp01(g), clamp01(b))
     }
 
     fn hit_sky(ray: Ray) -> Color {
