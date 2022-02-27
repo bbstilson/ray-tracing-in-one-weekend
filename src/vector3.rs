@@ -22,10 +22,14 @@ impl Vector3 {
         Vector3(0.0, 0.0, 0.0)
     }
 
+    pub fn random_unit_vector() -> Vector3 {
+        Vector3::random_in_unit_sphere().unit()
+    }
+
     // Returns a Vector from the center of a unit Sphere to a random point
     // on its surface.
     // https://karthikkaranth.me/blog/generating-random-points-in-a-sphere/
-    pub fn random_unit() -> Vector3 {
+    pub fn random_in_unit_sphere() -> Vector3 {
         let c = get_random();
         let mut x = get_random();
         let mut y = get_random();

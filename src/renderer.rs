@@ -78,7 +78,7 @@ impl Renderer {
         if remaining_steps > 0 {
             match self.world.hit(&ray, 0.001, f64::INFINITY) {
                 Some(hit) => {
-                    let target = hit.point + hit.normal + Vector3::random_unit();
+                    let target = hit.point + hit.normal + Vector3::random_unit_vector();
                     let reflection_ray = Ray::new(hit.point, target - hit.point);
                     self.ray_color(reflection_ray, remaining_steps - 1) * 0.5
                 }
