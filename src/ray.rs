@@ -11,7 +11,7 @@ impl Ray {
         Ray { origin, direction }
     }
 
-    pub fn at(self, t: f64) -> Vector3 {
+    pub fn at(&self, t: f64) -> Vector3 {
         self.origin + (self.direction * t)
     }
 }
