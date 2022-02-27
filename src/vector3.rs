@@ -1,4 +1,4 @@
-use crate::{point3d::Point3d, rng::get_random};
+use crate::rng::get_random;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Vector3(pub f64, pub f64, pub f64);
