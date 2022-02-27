@@ -51,7 +51,7 @@ fn get_output_file() -> PathBuf {
         .join(file_name)
 }
 
-fn hit_sphere(ray: &Ray) -> bool {
+fn hit_sphere(ray: &Ray) -> Option<f64> {
     let center = Point3d::new(0.0, 0.0, -1.0);
     let radius = 0.5;
 
@@ -60,15 +60,29 @@ fn hit_sphere(ray: &Ray) -> bool {
     let b = oc.dot(ray.direction) * 2.0;
     let c = oc.dot(oc) - radius * radius;
     let discriminant = b * b - 4.0 * a * c;
-    discriminant.is_sign_positive()
+
+    if discriminant.is_sign_positive() {
+        let t = (-b - discriminant.sqrt()) / (2.0 * a);
+        if t.is_sign_positive() {
+            Some(t)
+        } else {
+            None
+        }
+    } else {
+        None
+    }
 }
 
 fn ray_color(ray: Ray) -> Color {
-    if hit_sphere(&ray) {
-        SALMON
-    } else {
-        let unit_direction = Vector3::unit(ray.direction);
-        let t = 0.5 * (unit_direction.y() + 1.0);
-        (WHITE * (1.0 - t)) + (Color::new(0.5, 0.7, 1.0) * t)
+    match hit_sphere(&ray) {
+        Some(t) => {
+            let n = (ray.at(t) - Vector3(0.0, 0.0, -1.0)).unit();
+            return Color::new(n.x() + 1.0, n.y() + 1.0, n.z() + 1.0) * 0.5;
+        }
+        None => {
+            let unit_direction = Vector3::unit(ray.direction);
+            let t = 0.5 * (unit_direction.y() + 1.0);
+            (WHITE * (1.0 - t)) + (Color::new(0.5, 0.7, 1.0) * t)
+        }
     }
 }
