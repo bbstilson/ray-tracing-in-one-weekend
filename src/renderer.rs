@@ -3,7 +3,7 @@ use crate::color::{Color, BLACK, WHITE};
 use crate::hittable::Hittable;
 use crate::image::Image;
 use crate::ray::Ray;
-use crate::rng::RandomNumberGenerator;
+use crate::rng::get_random;
 use crate::utils::clamp01;
 use crate::vector3::Vector3;
 use crate::world::World;
@@ -21,7 +21,7 @@ pub struct Renderer {
     camera: Camera,
     world: World,
     samples_per_pixel: i32,
-    rng: RandomNumberGenerator,
+    max_ray_depth: i32,
 }
 
 impl Renderer {
@@ -30,14 +30,14 @@ impl Renderer {
         camera: Camera,
         world: World,
         samples_per_pixel: i32,
-        rng: RandomNumberGenerator,
+        max_ray_depth: i32,
     ) -> Renderer {
         Renderer {
             image,
             camera,
             world,
             samples_per_pixel,
-            rng,
+            max_ray_depth,
         }
     }
 
@@ -74,19 +74,27 @@ impl Renderer {
             .join(file_name)
     }
 
-    fn ray_color(&self, ray: Ray) -> Color {
-        match self.world.hit(&ray, 0.0, f64::INFINITY) {
-            Some(hit) => (WHITE + hit.normal) * 0.5,
-            None => Renderer::hit_sky(ray),
+    fn ray_color(&self, ray: Ray, remaining_steps: i32) -> Color {
+        if remaining_steps > 0 {
+            match self.world.hit(&ray, 0.0, f64::INFINITY) {
+                Some(hit) => {
+                    let target = hit.point + hit.normal + Vector3::random_unit();
+                    let reflection_ray = Ray::new(hit.point, target - hit.point);
+                    self.ray_color(reflection_ray, remaining_steps - 1) * 0.5
+                }
+                None => Renderer::hit_sky(ray),
+            }
+        } else {
+            BLACK
         }
     }
 
     fn get_antialiased_pixel_color(&mut self, w: i32, h: i32) -> Color {
         let pixel_color = (0..self.samples_per_pixel).fold(BLACK, |mut color, _| {
-            let u = (w as f64 + self.rng.get_random()) / (self.image.width - 1) as f64;
-            let v = (h as f64 + self.rng.get_random()) / (self.image.height - 1) as f64;
+            let u = (w as f64 + get_random()) / (self.image.width - 1) as f64;
+            let v = (h as f64 + get_random()) / (self.image.height - 1) as f64;
             let ray = self.camera.get_ray(u, v);
-            color += self.ray_color(ray);
+            color += self.ray_color(ray, self.max_ray_depth);
             color
         });
         self.antialias(pixel_color)

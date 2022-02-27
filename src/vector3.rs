@@ -1,3 +1,5 @@
+use crate::{point3d::Point3d, rng::get_random};
+
 #[derive(Debug, Clone, Copy)]
 pub struct Vector3(pub f64, pub f64, pub f64);
 
@@ -18,6 +20,23 @@ impl Vector3 {
 
     pub fn zero() -> Vector3 {
         Vector3(0.0, 0.0, 0.0)
+    }
+
+    // Returns a Vector from the center of a unit Sphere to a random point
+    // on its surface.
+    // https://karthikkaranth.me/blog/generating-random-points-in-a-sphere/
+    pub fn random_unit() -> Vector3 {
+        let c = get_random();
+        let mut x = get_random();
+        let mut y = get_random();
+        let mut z = get_random();
+
+        let mag = (x * x + y * y + z * z).sqrt();
+        x /= mag;
+        y /= mag;
+        z /= mag;
+
+        Vector3::new(x * c, y * c, z * c)
     }
 
     pub fn unit(self) -> Vector3 {

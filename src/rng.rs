@@ -1,17 +1,11 @@
-use rand::{prelude::ThreadRng, Rng};
+use std::ops::Range;
 
-pub struct RandomNumberGenerator {
-    rng: ThreadRng,
+use rand::Rng;
+
+pub fn get_random() -> f64 {
+    get_random_range(0.0..1.0)
 }
 
-impl RandomNumberGenerator {
-    pub fn new() -> RandomNumberGenerator {
-        RandomNumberGenerator {
-            rng: rand::thread_rng(),
-        }
-    }
-
-    pub fn get_random(&mut self) -> f64 {
-        self.rng.gen_range(0.0..1.0)
-    }
+pub fn get_random_range(range: Range<f64>) -> f64 {
+    rand::thread_rng().gen_range(range)
 }
