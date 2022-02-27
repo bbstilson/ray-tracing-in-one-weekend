@@ -1,8 +1,10 @@
 use crate::camera::Camera;
 use crate::color::{Color, SALMON, WHITE};
+use crate::hittable::Hittable;
 use crate::image::Image;
 use crate::point3d::Point3d;
 use crate::ray::Ray;
+use crate::sphere::Sphere;
 use crate::vector3::Vector3;
 
 use indicatif::ProgressIterator;
@@ -51,32 +53,12 @@ fn get_output_file() -> PathBuf {
         .join(file_name)
 }
 
-fn hit_sphere(ray: &Ray) -> Option<f64> {
-    let center = Point3d::new(0.0, 0.0, -1.0);
-    let radius = 0.5;
-
-    let oc = ray.origin - center;
-    let a = ray.direction.length_squared();
-    let half_b = oc.dot(ray.direction);
-    let c = oc.length_squared() - radius * radius;
-    let discriminant = half_b * half_b - a * c;
-
-    if discriminant.is_sign_positive() {
-        let t = (-half_b - discriminant.sqrt()) / a;
-        if t.is_sign_positive() {
-            Some(t)
-        } else {
-            None
-        }
-    } else {
-        None
-    }
-}
-
 fn ray_color(ray: Ray) -> Color {
-    match hit_sphere(&ray) {
-        Some(t) => {
-            let n = (ray.at(t) - Vector3(0.0, 0.0, -1.0)).unit();
+    let sphere = Sphere::new(Point3d::new(0.0, 0.0, -1.0), 0.5);
+
+    match sphere.hit(&ray, 0.0, f64::MAX) {
+        Some(hit) => {
+            let n = (ray.at(hit.t) - Vector3(0.0, 0.0, -1.0)).unit();
             return Color::new(n.x() + 1.0, n.y() + 1.0, n.z() + 1.0) * 0.5;
         }
         None => {
