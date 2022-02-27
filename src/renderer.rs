@@ -56,13 +56,13 @@ fn hit_sphere(ray: &Ray) -> Option<f64> {
     let radius = 0.5;
 
     let oc = ray.origin - center;
-    let a = ray.direction.dot(ray.direction);
-    let b = oc.dot(ray.direction) * 2.0;
-    let c = oc.dot(oc) - radius * radius;
-    let discriminant = b * b - 4.0 * a * c;
+    let a = ray.direction.length_squared();
+    let half_b = oc.dot(ray.direction);
+    let c = oc.length_squared() - radius * radius;
+    let discriminant = half_b * half_b - a * c;
 
     if discriminant.is_sign_positive() {
-        let t = (-b - discriminant.sqrt()) / (2.0 * a);
+        let t = (-half_b - discriminant.sqrt()) / a;
         if t.is_sign_positive() {
             Some(t)
         } else {
