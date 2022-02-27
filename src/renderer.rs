@@ -107,9 +107,9 @@ impl Renderer {
 
         // Divide the color by the number of samples.
         let scale = 1.0 / self.samples_per_pixel as f64;
-        let r = r * scale;
-        let g = g * scale;
-        let b = b * scale;
+        let r = (r * scale).sqrt();
+        let g = (g * scale).sqrt();
+        let b = (b * scale).sqrt();
 
         Color::new(clamp01(r), clamp01(g), clamp01(b))
     }
