@@ -5,6 +5,14 @@ use crate::vector3::Vector3;
 //
 // Vector3 ops
 //
+impl ops::Neg for Vector3 {
+    type Output = Vector3;
+
+    fn neg(self) -> Vector3 {
+        Vector3::new(-self.0, -self.1, -self.2)
+    }
+}
+
 impl ops::Add for Vector3 {
     type Output = Vector3;
 

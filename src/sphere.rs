@@ -30,7 +30,13 @@ impl Hittable for Sphere {
                 .map(|root| {
                     let t = *root;
                     let point = ray.at(t);
-                    let normal = (point - self.center) / self.radius;
+                    let outward_normal = (point - self.center) / self.radius;
+                    let is_front_face = ray.direction.dot(outward_normal).is_sign_negative();
+                    let normal = if is_front_face {
+                        outward_normal
+                    } else {
+                        -outward_normal
+                    };
                     Hit { t, point, normal }
                 })
         } else {
