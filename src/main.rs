@@ -16,6 +16,7 @@ fn main() {
         Sphere::new(Point3d::new(0.0, -100.5, -1.0), 100.0, material_ground),
         Sphere::new(Point3d::new(0.0, 0.0, -1.0), 0.5, material_center),
         Sphere::new(Point3d::new(-1.0, 0.0, -1.0), 0.5, material_left),
+        Sphere::new(Point3d::new(-1.0, 0.0, -1.0), -0.4, material_left),
         Sphere::new(Point3d::new(1.0, 0.0, -1.0), 0.5, material_right),
     ]);
 

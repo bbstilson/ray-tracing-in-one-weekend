@@ -2,6 +2,7 @@ use crate::{
     color::{Color, WHITE},
     hit::Hit,
     ray::Ray,
+    rng::get_random,
     scatterable::Scatterable,
     vector3::Vector3,
 };
@@ -18,9 +19,7 @@ impl Scatterable for Material {
         match self {
             &Material::Lambartian(color) => lambartian(color, hit),
             &Material::Metal(color, fuzz) => metal(color, fuzz, ray_in, hit),
-            &Material::Dielectric(index_of_refraction) => {
-                dielectric(index_of_refraction, ray_in, hit)
-            }
+            &Material::Dielectric(refraction_index) => dielectric(refraction_index, ray_in, hit),
         }
     }
 }
@@ -56,18 +55,21 @@ fn metal(color: Color, fuzz: f64, ray_in: &Ray, hit: &Hit) -> Option<(Ray, Color
     }
 }
 
-fn dielectric(index_of_refraction: f64, ray_in: &Ray, hit: &Hit) -> Option<(Ray, Color)> {
+fn dielectric(refraction_index: f64, ray_in: &Ray, hit: &Hit) -> Option<(Ray, Color)> {
     let refraction_ratio = if hit.is_front_face {
-        1.0 / index_of_refraction
+        1.0 / refraction_index
     } else {
-        index_of_refraction
+        refraction_index
     };
     let unit_direction = ray_in.direction.unit();
 
     let cos_theta = (-unit_direction.dot(hit.normal)).min(1.0);
     let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
 
-    let direction = if refraction_ratio * sin_theta > 1.0 {
+    let cannot_refract = refraction_ratio * sin_theta > 1.0;
+    let should_reflect = reflectance(cos_theta, refraction_index) > get_random();
+
+    let direction = if cannot_refract || should_reflect {
         unit_direction.reflect(hit.normal)
     } else {
         unit_direction.refract(hit.normal, refraction_ratio)
@@ -75,4 +77,11 @@ fn dielectric(index_of_refraction: f64, ray_in: &Ray, hit: &Hit) -> Option<(Ray,
 
     let scattered = Ray::new(hit.point, direction);
     Some((scattered, WHITE))
+}
+
+// Use Schlick's approximation for reflectance.
+fn reflectance(cosine: f64, refraction_index: f64) -> f64 {
+    let r0 = (1.0 - refraction_index) / (1.0 + refraction_index);
+    let r02 = r0.powi(2);
+    r02 + (1.0 - r02) * (1.0 - cosine).powi(5)
 }
