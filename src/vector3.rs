@@ -60,6 +60,13 @@ impl Vector3 {
         self - (normal * (self.dot(normal) * 2.0))
     }
 
+    pub fn refract(self, normal: Vector3, refraction_ratio: f64) -> Vector3 {
+        let cos_theta = (-self).dot(normal).min(1.0);
+        let r_out_perpendicular = (self + (normal * cos_theta)) * refraction_ratio;
+        let r_out_parallel = normal * -(1.0 - r_out_perpendicular.length_squared()).abs().sqrt();
+        r_out_perpendicular + r_out_parallel
+    }
+
     pub fn dot(self, rhs: Vector3) -> f64 {
         self.0 * rhs.0 + self.1 * rhs.1 + self.2 * rhs.2
     }

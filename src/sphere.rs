@@ -40,6 +40,7 @@ impl Hittable for Sphere {
                     Hit {
                         t,
                         point,
+                        is_front_face,
                         material: self.material,
                         normal: if is_front_face { normal } else { -normal },
                     }
