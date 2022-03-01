@@ -1,3 +1,5 @@
+use std::f64::consts::PI;
+
 use raytracer::{
     camera::Camera, color::Color, image::Image, material::Material, point3d::Point3d,
     renderer::Renderer, sphere::Sphere, world::World,
@@ -5,19 +7,16 @@ use raytracer::{
 
 fn main() {
     let image = Image::new(400, 255);
-    let camera = Camera::new(2.0, 1.0, image.aspect_ratio);
+    let camera = Camera::new(90, image.aspect_ratio);
 
-    let material_ground = Material::Lambartian(Color::new(0.8, 0.8, 0.0));
-    let material_center = Material::Lambartian(Color::new(0.1, 0.2, 0.5));
-    let material_left = Material::Dielectric(1.5);
-    let material_right = Material::Metal(Color::new(0.8, 0.6, 0.2), 1.0);
+    let material_left = Material::Lambartian(Color::new(0.0, 0.0, 1.0));
+    let material_right = Material::Lambartian(Color::new(1.0, 0.0, 0.0));
+
+    let radius = (PI / 4.0).cos();
 
     let world = World::new(vec![
-        Sphere::new(Point3d::new(0.0, -100.5, -1.0), 100.0, material_ground),
-        Sphere::new(Point3d::new(0.0, 0.0, -1.0), 0.5, material_center),
-        Sphere::new(Point3d::new(-1.0, 0.0, -1.0), 0.5, material_left),
-        Sphere::new(Point3d::new(-1.0, 0.0, -1.0), -0.4, material_left),
-        Sphere::new(Point3d::new(1.0, 0.0, -1.0), 0.5, material_right),
+        Sphere::new(Point3d::new(-radius, 0.0, -1.0), radius, material_left),
+        Sphere::new(Point3d::new(radius, 0.0, -1.0), radius, material_right),
     ]);
 
     let samples_per_pixel = 100;
