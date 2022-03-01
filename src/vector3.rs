@@ -1,5 +1,7 @@
 use crate::rng::get_random;
 
+const CLOSE_TO_ZERO: f64 = 1e-8;
+
 #[derive(Debug, Clone, Copy)]
 pub struct Vector3(pub f64, pub f64, pub f64);
 
@@ -45,6 +47,17 @@ impl Vector3 {
 
     pub fn unit(self) -> Vector3 {
         self / self.length()
+    }
+
+    // Return true if the vector is close to zero in all dimensions.
+    pub fn is_near_zero(&self) -> bool {
+        return (self.x().abs() < CLOSE_TO_ZERO)
+            && (self.y().abs() < CLOSE_TO_ZERO)
+            && (self.z().abs() < CLOSE_TO_ZERO);
+    }
+
+    pub fn reflect(self, normal: Vector3) -> Vector3 {
+        self - (normal * (self.dot(normal) * 2.0))
     }
 
     pub fn dot(self, rhs: Vector3) -> f64 {

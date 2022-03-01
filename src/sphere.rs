@@ -1,13 +1,18 @@
-use crate::{hit::Hit, hittable::Hittable, point3d::Point3d, ray::Ray};
+use crate::{hit::Hit, hittable::Hittable, material::Material, point3d::Point3d, ray::Ray};
 
 pub struct Sphere {
     center: Point3d,
     radius: f64,
+    material: Material,
 }
 
 impl Sphere {
-    pub fn new(center: Point3d, radius: f64) -> Sphere {
-        Sphere { center, radius }
+    pub fn new(center: Point3d, radius: f64, material: Material) -> Sphere {
+        Sphere {
+            center,
+            radius,
+            material,
+        }
     }
 }
 
@@ -35,6 +40,7 @@ impl Hittable for Sphere {
                     Hit {
                         t,
                         point,
+                        material: self.material,
                         normal: if is_front_face { normal } else { -normal },
                     }
                 })

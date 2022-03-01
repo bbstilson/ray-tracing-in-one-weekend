@@ -4,6 +4,7 @@ use crate::hittable::Hittable;
 use crate::image::Image;
 use crate::ray::Ray;
 use crate::rng::get_random;
+use crate::scatterable::Scatterable;
 use crate::utils::clamp01;
 use crate::vector3::Vector3;
 use crate::world::World;
@@ -77,11 +78,12 @@ impl Renderer {
     fn ray_color(&self, ray: Ray, remaining_steps: i32) -> Color {
         if remaining_steps > 0 {
             match self.world.hit(&ray, 0.001, f64::INFINITY) {
-                Some(hit) => {
-                    let target = hit.point + hit.normal + Vector3::random_unit_vector();
-                    let reflection_ray = Ray::new(hit.point, target - hit.point);
-                    self.ray_color(reflection_ray, remaining_steps - 1) * 0.5
-                }
+                Some(hit) => match hit.material.scatter(&ray, &hit) {
+                    Some((scattered, attenuation)) => {
+                        attenuation * self.ray_color(scattered, remaining_steps - 1)
+                    }
+                    None => BLACK,
+                },
                 None => Renderer::hit_sky(ray),
             }
         } else {
