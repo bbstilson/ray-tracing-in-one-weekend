@@ -8,14 +8,9 @@ fn main() {
     let camera = Camera::new(2.0, 1.0, image.aspect_ratio);
 
     let material_ground = Material::Lambartian(Color::new(0.8, 0.8, 0.0));
-    let material_center = Material::Dielectric(1.5);
+    let material_center = Material::Lambartian(Color::new(0.1, 0.2, 0.5));
     let material_left = Material::Dielectric(1.5);
     let material_right = Material::Metal(Color::new(0.8, 0.6, 0.2), 1.0);
-
-    // let material_ground = Material::Lambartian(Color::new(0.8, 0.8, 0.0));
-    // let material_center = Material::Lambartian(Color::new(0.1, 0.2, 0.5));
-    // let material_left = Material::Dielectric(1.5);
-    // let material_right = Material::Metal(Color::new(0.8, 0.6, 0.2), 0.0);
 
     let world = World::new(vec![
         Sphere::new(Point3d::new(0.0, -100.5, -1.0), 100.0, material_ground),

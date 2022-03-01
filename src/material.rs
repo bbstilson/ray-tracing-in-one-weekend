@@ -63,7 +63,16 @@ fn dielectric(index_of_refraction: f64, ray_in: &Ray, hit: &Hit) -> Option<(Ray,
         index_of_refraction
     };
     let unit_direction = ray_in.direction.unit();
-    let refracted = unit_direction.refract(hit.normal, refraction_ratio);
-    let scattered = Ray::new(hit.point, refracted);
+
+    let cos_theta = (-unit_direction.dot(hit.normal)).min(1.0);
+    let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
+
+    let direction = if refraction_ratio * sin_theta > 1.0 {
+        unit_direction.reflect(hit.normal)
+    } else {
+        unit_direction.refract(hit.normal, refraction_ratio)
+    };
+
+    let scattered = Ray::new(hit.point, direction);
     Some((scattered, WHITE))
 }
