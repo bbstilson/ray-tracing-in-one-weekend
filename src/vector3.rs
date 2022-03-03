@@ -45,6 +45,12 @@ impl Vector3 {
         Vector3::new(x * c, y * c, z * c)
     }
 
+    pub fn random_in_unit_circle() -> Vector3 {
+        let mut vec3 = Vector3::random_in_unit_sphere();
+        vec3.2 = 0.0;
+        vec3
+    }
+
     pub fn unit(self) -> Vector3 {
         self / self.length()
     }

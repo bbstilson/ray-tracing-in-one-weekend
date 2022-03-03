@@ -1,5 +1,6 @@
 pub mod camera;
 pub mod color;
+pub mod file;
 pub mod hit;
 pub mod hittable;
 pub mod image;
@@ -9,6 +10,7 @@ pub mod ray;
 pub mod renderer;
 pub mod rng;
 pub mod scatterable;
+pub mod scene;
 pub mod sphere;
 pub mod utils;
 pub mod vector3;

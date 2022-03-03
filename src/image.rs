@@ -1,11 +1,11 @@
 pub struct Image {
-    pub width: i32,
-    pub height: i32,
+    pub width: u32,
+    pub height: u32,
     pub aspect_ratio: f64,
 }
 
 impl Image {
-    pub fn new(width: i32, height: i32) -> Image {
+    pub fn new(width: u32, height: u32) -> Image {
         Image {
             width,
             height,
